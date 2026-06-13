@@ -1,9 +1,7 @@
 # Temp files
-*.js
 temp_*
 .playwright-cli/
-current-state.yaml
-game-snapshot.yaml
+*.yml
 
 # OS files
 .DS_Store

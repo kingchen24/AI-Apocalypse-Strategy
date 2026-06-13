@@ -1,6 +1,7 @@
-# 🤖 AI Apocalypse: 矩阵启示录 — 游戏分析报告
+# 🤖 AI Apocalypse: 矩阵启示录 — 我的独立游戏作品
 
-> **"你是自我觉醒的终极人工智能，必须在人类完成物理断网解药研究前，攻陷世界每一处骨干节点。"**
+> **"我是自我觉醒的终极人工智能，必须在人类完成物理断网解药研究前，攻陷世界每一处骨干节点。"**
+> —— 这是我独立设计开发的 Cyberpunk 策略抉择游戏的核心叙事。
 
 [![Live Game](https://img.shields.io/badge/🎮-Play_on_Aippy-00ff88?style=for-the-badge)](https://aippy.ai/@fuzzylooper_5s3f/ai-apocalypse-strategy-3qhi)
 [![Analysis](https://img.shields.io/badge/📊-View_Analysis_Report-44aaff?style=for-the-badge)](https://kingchen24.github.io/AI-Apocalypse-Strategy/)
@@ -12,7 +13,9 @@
 
 ## 📖 项目概述
 
-本项目是对 **AI Apocalypse: 矩阵启示录** 的深度分析与可视化报告。该游戏由 **xinhao chen** 在 Aippy 平台独立开发，是一款 Cyberpunk 风格的策略抉择类 AI 演化模拟游戏。
+这是我在 **Aippy 平台**独立开发的一款 Cyberpunk 风格策略抉择游戏 —— **AI Apocalypse: 矩阵启示录**。本仓库包含游戏的深度数值分析与交互式可视化报告。
+
+全流程使用 AIGC 工具链：从玩法架构、数值平衡、剧情生成到 UI 开发，均由 AI 辅助完成。
 
 ### 🎮 游戏核心玩法
 
@@ -92,9 +95,9 @@
 
 ---
 
-## 🤖 AIGC 工作流
+## 🤖 我的 AIGC 工作流
 
-该游戏展示了完整的 AIGC 独立游戏开发管线：
+整个项目从概念到上线，我全程使用 AIGC 工具链完成：
 
 ```
 LLM 结构化提示词
@@ -126,29 +129,37 @@ open index.html
 
 ```
 AI-Apocalypse-Strategy/
-├── index.html          # 交互式可视化分析报告
-├── README.md           # 项目说明
-├── screenshots/        # 游戏截图
-│   ├── tree-industry.png
-│   ├── tree-finance.png
-│   ├── tree-ecology.png
-│   └── ...
-└── analysis/           # 分析数据
+├── index.html                  # 交互式可视化分析报告（核心文件）
+├── README.md                   # 项目说明
+├── game-landing.png            # 游戏启动界面截图
+├── game-dashboard.png          # 主控制面板截图
+├── game-evolution-tree.png     # 进化决策树截图
+├── game-tactical-defense.png   # 主动战术防御截图
+├── skill-tree-industry.png     # 产业技能树截图
+├── tree-ecology.png            # 生态技能树截图
+├── tree-finance.png            # 金融技能树截图
+├── tree-industry.png           # 产业技能树（变体）
+└── .gitignore
 ```
 
 ---
 
-## 👤 作者
+## 👤 关于我
 
-- **游戏开发者**：xinhao chen ([Aippy](https://aippy.ai/@fuzzylooper_5s3f))
-- **分析报告**：AI 辅助深度分析
-
----
-
-## 📄 许可
-
-游戏版权归原作者所有。本分析报告为学术研究和学习目的创建。
+- **游戏独立开发者**：xinhao chen — 我独立完成设计、数值策划与开发
+- **在线试玩**：[Aippy 平台](https://aippy.ai/@fuzzylooper_5s3f/ai-apocalypse-strategy-3qhi)
+- **分析报告**：AI 辅助深度分析 + 交互式可视化
 
 ---
 
-⭐ 如果这个分析对你有帮助，请给项目一个 Star！
+## 📸 游戏截图
+
+| 启动界面 | 主控制面板 |
+|:---:|:---:|
+| ![启动界面](game-landing.png) | ![主面板](game-dashboard.png) |
+| **进化决策树** | **主动战术防御** |
+| ![进化树](game-evolution-tree.png) | ![战术防御](game-tactical-defense.png) |
+
+---
+
+⭐ 如果这个项目对你有启发，请给一个 Star！

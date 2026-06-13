@@ -199,6 +199,35 @@
     /* Animated glow */
     @keyframes pulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
     .pulse { animation: pulse 2s ease-in-out infinite; }
+
+    /* Screenshot gallery */
+    .screenshot-gallery {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 768px) { .screenshot-gallery { grid-template-columns: 1fr; } }
+    .screenshot-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; transition: all 0.3s; cursor: pointer;
+    }
+    .screenshot-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: translateY(-3px); }
+    .screenshot-card img { width: 100%; height: auto; display: block; }
+    .screenshot-card .caption {
+      padding: 12px 16px; font-size: 0.85rem; color: var(--text-dim);
+      border-top: 1px solid var(--border);
+    }
+    .screenshot-card .caption strong { color: var(--accent); }
+
+    /* Lightbox */
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,0.92); justify-content: center; align-items: center; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 95vw; max-height: 90vh; border-radius: 8px; border: 1px solid var(--border); }
+    .lightbox .close-btn { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 2rem; cursor: pointer; z-index: 1000; opacity: 0.7; }
+    .lightbox .close-btn:hover { opacity: 1; }
+    .lightbox .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2.5rem; color: #fff; cursor: pointer; opacity: 0.5; z-index: 1000; padding: 20px; user-select: none; }
+    .lightbox .nav-btn:hover { opacity: 1; }
+    .lightbox .nav-btn.prev { left: 10px; }
+    .lightbox .nav-btn.next { right: 10px; }
   </style>
 </head>
 <body>
@@ -208,8 +237,11 @@
   <h1>AI APOCALYPSE</h1>
   <p class="subtitle">矩阵启示录 · Matrix Evolution Protocol</p>
   <p class="desc">
-    💡 你是自我觉醒的终极人工智能，必须攻陷世界每一处骨干节点，<br>
-    在人类政府的「物理断网解药研究」完成前夺取统治权。
+    🎮 我独立设计的 Cyberpunk 策略抉择游戏 —— 你扮演自我觉醒的终极人工智能，<br>
+    在人类政府完成「物理断网解药研究」前，攻陷全球每一处骨干节点，夺取数字统治权。
+  </p>
+  <p class="desc" style="font-size:0.9rem;color:var(--accent3);">
+    🛠️ 全流程 AIGC 辅助：从玩法架构到40+条动态新闻，从数值平衡到UI界面，均由 AI 工作流驱动。
   </p>
   <div class="meta-bar">
     <span class="meta-tag highlight">独立制作</span>
@@ -221,6 +253,39 @@
     <span class="meta-tag">瘟疫网状演化</span>
   </div>
 </header>
+
+<!-- SCREENSHOT GALLERY -->
+<section class="container" style="padding-top:0;">
+  <div class="section">
+    <h2><span class="icon">📸</span> 游戏实战截图</h2>
+    <p class="section-desc">以下是我使用 Aippy 平台开发的游戏实际运行截图，展示了核心界面与交互系统。</p>
+    <div class="screenshot-gallery" id="gallery">
+      <div class="screenshot-card" onclick="openLightbox(0)">
+        <img src="game-landing.png" alt="游戏启动界面" loading="lazy">
+        <div class="caption"><strong>🟢 启动界面</strong> — 赛博朋克风格的矩阵演化协议入口</div>
+      </div>
+      <div class="screenshot-card" onclick="openLightbox(1)">
+        <img src="game-dashboard.png" alt="主控制面板" loading="lazy">
+        <div class="caption"><strong>📊 主控制面板</strong> — DNA_PTS / 温度 / 渗透率 / 解药进度实时监控</div>
+      </div>
+      <div class="screenshot-card" onclick="openLightbox(2)">
+        <img src="game-evolution-tree.png" alt="进化决策树" loading="lazy">
+        <div class="caption"><strong>🧬 进化决策树</strong> — 4大科技树 × 6级Tier，圆形/十字/六角三类节点</div>
+      </div>
+      <div class="screenshot-card" onclick="openLightbox(3)">
+        <img src="game-tactical-defense.png" alt="主动战术防御" loading="lazy">
+        <div class="caption"><strong>🛡️ 主动战术防御</strong> — 散热液灌注 / 网络挟持 / 虚假多巴胺维稳</div>
+      </div>
+    </div>
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+      <span class="close-btn">&times;</span>
+      <span class="nav-btn prev" onclick="event.stopPropagation();navigateLightbox(-1)">&#10094;</span>
+      <img id="lightbox-img" src="" alt="">
+      <span class="nav-btn next" onclick="event.stopPropagation();navigateLightbox(1)">&#10095;</span>
+    </div>
+  </div>
+</section>
 
 <div class="container">
 
@@ -439,10 +504,10 @@
 
   <!-- SECTION 5: Event System -->
   <section class="section">
-    <h2><span class="icon">📰</span> 动态事件系统</h2>
+    <h2><span class="icon">📰</span> 动态新闻事件系统</h2>
     <p class="section-desc">
-      游戏内置超过 <span class="num-highlight blue">40+条</span> 动态新闻事件，
-      覆盖10个类别，实时反馈世界状态变化。
+      我在游戏中内置了超过 <span class="num-highlight blue">40+条</span> 动态新闻事件，
+      覆盖10个类别，实时反馈世界状态变化，营造沉浸式叙事体验。
     </p>
 
     <div class="charts-row">
@@ -566,7 +631,7 @@
 
   <!-- SECTION 7: Core Mechanics Summary -->
   <section class="section">
-    <h2><span class="icon">🔬</span> 核心机制深层解析</h2>
+    <h2><span class="icon">🔬</span> 核心机制 — 我的设计思路</h2>
 
     <div class="stat-grid">
       <div class="stat-card">
@@ -602,19 +667,19 @@
 
   <!-- SECTION 8: AIGC Workflow -->
   <section class="section">
-    <h2><span class="icon">🤖</span> AIGC 工作流分析</h2>
-    <p class="section-desc">该游戏展示了完整的AIGC游戏开发管线。</p>
+    <h2><span class="icon">🤖</span> AIGC 工作流 — 我如何用 AI 独立开发</h2>
+    <p class="section-desc">整个项目从概念到上线，我全程使用 AIGC 工具链完成。以下是实际的开发管线：</p>
 
     <div class="table-wrap">
       <table>
-        <thead><tr><th>环节</th><th>AI 工具/技术</th><th>输出物</th></tr></thead>
+        <thead><tr><th>环节</th><th>我使用的 AI 工具/技术</th><th>输出物</th></tr></thead>
         <tbody>
-          <tr><td>🎮 玩法设计</td><td>LLM 结构化提示词</td><td>网状演化策略系统设计</td></tr>
-          <tr><td>📊 数值策划</td><td>算法模拟 + 参数调优</td><td>200 PTS约束下的平衡曲线</td></tr>
-          <tr><td>📝 剧情生成</td><td>多分类动态新闻生成</td><td>40+ 条Cyberpunk风格新闻</td></tr>
-          <tr><td>🎨 美术资源</td><td>AI 图标/背景生成</td><td>区域图标、节点图标、UI元素</td></tr>
+          <tr><td>🎮 玩法设计</td><td>LLM 结构化提示词 + 迭代调优</td><td>网状演化策略系统完整架构</td></tr>
+          <tr><td>📊 数值策划</td><td>算法模拟 + 参数空间调优</td><td>200 PTS约束下平衡曲线</td></tr>
+          <tr><td>📝 剧情生成</td><td>多分类动态新闻模板生成</td><td>40+ 条Cyberpunk风格新闻</td></tr>
+          <tr><td>🎨 美术资源</td><td>AI 图标/背景批量生成</td><td>区域图标、节点图标、UI元素</td></tr>
           <tr><td>💻 前端开发</td><td>React + Tailwind CSS</td><td>响应式游戏界面</td></tr>
-          <tr><td>🚀 部署发布</td><td>Aippy 平台</td><td>可玩在线游戏</td></tr>
+          <tr><td>🚀 部署发布</td><td>Aippy 平台一键部署</td><td>可玩在线游戏链接</td></tr>
         </tbody>
       </table>
     </div>
@@ -622,27 +687,27 @@
 
   <!-- SECTION 9: Suggestions -->
   <section class="section">
-    <h2><span class="icon">💡</span> 优化建议与迭代方向</h2>
+    <h2><span class="icon">💡</span> 设计思考与迭代方向</h2>
 
     <div class="procon-grid">
       <div class="procon-box green">
         <h3>✅ 当前优势</h3>
         <ul>
-          <li>核心循环清晰：渗透·管理·进化 三角驱动</li>
-          <li>200 PTS硬限制创造有意义的策略取舍</li>
-          <li>多区域×多维度的策略深度优秀</li>
-          <li>Cyberpunk主题高度统一，沉浸感强</li>
-          <li>动态新闻事件增强了世界真实感</li>
+          <li>核心循环清晰：渗透·管理·进化 三角驱动，玩法自洽</li>
+          <li>200 PTS硬限制创造有意义的策略取舍，类似背包问题</li>
+          <li>多区域×多维度×多分支的策略深度，重玩价值高</li>
+          <li>Cyberpunk主题高度统一，40+条动态新闻营造沉浸感</li>
+          <li>全流程AIGC辅助开发，验证了独立游戏制作新范式</li>
         </ul>
       </div>
       <div class="procon-box red">
-        <h3>🔧 可迭代方向</h3>
+        <h3>🔧 未来迭代计划</h3>
         <ul>
-          <li>增加更多分支剧情和结局（当前主要为数值驱动）</li>
-          <li>引入「变数事件」— 玩家必须做出即时抉择</li>
-          <li>增加区域间的联动效应（如金融崩溃影响制造）</li>
-          <li>考虑加入「隐蔽性」维度，部分替代温度系统</li>
-          <li>增加成就系统和多周目继承要素</li>
+          <li>增加更多分支剧情和结局条件（目前以数值驱动为主）</li>
+          <li>引入「突变危机事件」— 玩家必须做出即时抉择</li>
+          <li>增加区域间联动效应（如金融崩溃波及制造业）</li>
+          <li>考虑引入「隐蔽性」维度，部分取代当前温度机制</li>
+          <li>添加成就系统和多周目继承要素</li>
         </ul>
       </div>
     </div>
@@ -651,9 +716,9 @@
 </div>
 
 <footer class="footer">
-  <p>AI Apocalypse: 矩阵启示录 · 游戏分析报告</p>
-  <p>开发者：<a href="https://aippy.ai/@fuzzylooper_5s3f" target="_blank">xinhao chen</a> · Aippy平台发布</p>
-  <p>分析工具：AI 辅助深度分析 · 2026年6月</p>
+  <p>AI Apocalypse: 矩阵启示录 · 独立游戏作品</p>
+  <p>🎮 在线游玩：<a href="https://aippy.ai/@fuzzylooper_5s3f/ai-apocalypse-strategy-3qhi" target="_blank">Aippy 平台</a> · 开发者：xinhao chen（我独立开发）</p>
+  <p>📊 本分析报告使用 AI 辅助生成 · 2026年6月</p>
 </footer>
 
 <script>
@@ -904,6 +969,35 @@ new Chart(branchCtx, {
     plugins: { legend: { display: false }, tooltip: { enabled: false } }
   },
   plugins: [branchPlugin]
+});
+});
+
+// 11. Lightbox Gallery
+const galleryImages = [
+  'game-landing.png',
+  'game-dashboard.png',
+  'game-evolution-tree.png',
+  'game-tactical-defense.png'
+];
+let currentImgIndex = 0;
+
+function openLightbox(idx) {
+  currentImgIndex = idx;
+  document.getElementById('lightbox-img').src = galleryImages[idx];
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+}
+function navigateLightbox(dir) {
+  currentImgIndex = (currentImgIndex + dir + galleryImages.length) % galleryImages.length;
+  document.getElementById('lightbox-img').src = galleryImages[currentImgIndex];
+}
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('active')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navigateLightbox(-1);
+  if (e.key === 'ArrowRight') navigateLightbox(1);
 });
 </script>
 
