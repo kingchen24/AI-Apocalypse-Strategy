@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Apocalypse: 矩阵启示录 - 游戏分析报告</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+  </script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --panel: #12121a;
+      --border: #1e1e30;
+      --accent: #00ff88;
+      --accent2: #ff4466;
+      --accent3: #44aaff;
+      --accent4: #ffaa00;
+      --accent5: #aa44ff;
+      --text: #c8c8d0;
+      --text-dim: #6a6a7a;
+      --text-bright: #e8e8f0;
+      --glow: 0 0 20px rgba(0,255,136,0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative; z-index: 1;
+      text-align: center; padding: 80px 20px 60px;
+      background: linear-gradient(180deg, rgba(0,255,136,0.08) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      font-size: 3.2rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), #00ddaa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: 4px; margin-bottom: 12px;
+    }
+    .hero .subtitle { color: var(--accent); font-size: 1.2rem; letter-spacing: 6px; text-transform: uppercase; }
+    .hero .desc { color: var(--text-dim); margin-top: 20px; max-width: 700px; margin-left: auto; margin-right: auto; font-size: 1.05rem; }
+    .hero .meta-bar { 
+      margin-top: 30px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+    }
+    .hero .meta-tag {
+      padding: 6px 18px; border-radius: 20px; font-size: 0.85rem;
+      border: 1px solid var(--border); background: var(--panel);
+      color: var(--text-dim);
+    }
+    .hero .meta-tag.highlight { border-color: var(--accent); color: var(--accent); }
+
+    /* Container */
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 1; }
+
+    /* Section */
+    .section { margin-bottom: 60px; }
+    .section h2 {
+      font-size: 1.8rem; color: var(--text-bright); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section h2 .icon { font-size: 1.5rem; }
+    .section .section-desc { color: var(--text-dim); margin-bottom: 30px; font-size: 0.95rem; }
+
+    /* Stat cards */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 30px; }
+    .stat-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px;
+      transition: all 0.3s;
+    }
+    .stat-card:hover { border-color: var(--accent); box-shadow: var(--glow); transform: translateY(-2px); }
+    .stat-card .label { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 2.2rem; font-weight: 700; color: var(--text-bright); }
+    .stat-card .unit { font-size: 1rem; color: var(--text-dim); }
+    .stat-card .sub { color: var(--text-dim); font-size: 0.85rem; margin-top: 6px; }
+
+    /* Charts */
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px; }
+    @media (max-width: 768px) { .charts-row { grid-template-columns: 1fr; } }
+    .chart-box {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; position: relative;
+    }
+    .chart-box h3 { color: var(--text-bright); margin-bottom: 16px; font-size: 1.05rem; }
+    .chart-box canvas { max-height: 320px; }
+    .chart-box.full { grid-column: 1 / -1; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin-bottom: 30px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--accent); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; background: rgba(0,255,136,0.03); }
+    td { color: var(--text); }
+    tr:hover td { background: rgba(0,255,136,0.02); }
+    .bar-cell { position: relative; }
+    .bar-cell .fill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(0,255,136,0.12); border-radius: 0 2px 2px 0; z-index: 0; }
+    .bar-cell .txt { position: relative; z-index: 1; }
+
+    /* Tree visualization */
+    .tree-viz { 
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 768px) { .tree-viz { grid-template-columns: 1fr 1fr; } }
+    .tree-cat {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+    }
+    .tree-cat .cat-header { font-size: 1.1rem; color: var(--text-bright); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .tier-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 6px 8px; border-radius: 6px; font-size: 0.8rem; }
+    .tier-dot {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700; color: var(--bg); flex-shrink: 0;
+    }
+    .tier-dot.circle { background: var(--accent3); border-radius: 50%; }
+    .tier-dot.cross { background: var(--accent2); clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%); }
+    .tier-dot.hex { background: var(--accent4); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+    .tier-name { color: var(--text); font-size: 0.75rem; }
+
+    /* Branch flow */
+    .branch-flow {
+      display: flex; flex-direction: column; gap: 20px; padding: 20px;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .flow-row { display: flex; align-items: center; gap: 12px; }
+    .flow-node {
+      padding: 10px 20px; border-radius: 8px; font-size: 0.85rem;
+      border: 1px solid var(--border); background: var(--panel);
+    }
+    .flow-node.start { border-color: var(--accent); color: var(--accent); }
+    .flow-node.choice { border-color: var(--accent2); color: var(--accent2); }
+    .flow-node.ending { border-color: var(--accent4); color: var(--accent4); }
+    .flow-arrow { color: var(--text-dim); font-size: 1.2rem; }
+
+    /* Pro/Con */
+    .procon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px; }
+    .procon-box { 
+      border-radius: 12px; padding: 24px; border: 1px solid var(--border);
+    }
+    .procon-box.green { background: rgba(0,255,136,0.04); border-color: rgba(0,255,136,0.2); }
+    .procon-box.red { background: rgba(255,68,102,0.04); border-color: rgba(255,68,102,0.2); }
+    .procon-box h3 { margin-bottom: 16px; font-size: 1.05rem; }
+    .procon-box.green h3 { color: var(--accent); }
+    .procon-box.red h3 { color: var(--accent2); }
+    .procon-box ul { list-style: none; }
+    .procon-box li { padding: 8px 0; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .procon-box li::before { content: '• '; margin-right: 6px; }
+
+    /* Number highlight */
+    .num-highlight {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-weight: 700; font-family: 'Consolas', monospace;
+    }
+    .num-highlight.green { background: rgba(0,255,136,0.15); color: var(--accent); }
+    .num-highlight.red { background: rgba(255,68,102,0.15); color: var(--accent2); }
+    .num-highlight.blue { background: rgba(68,170,255,0.15); color: var(--accent3); }
+
+    /* Event timeline */
+    .event-timeline { 
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; 
+      margin-bottom: 30px;
+    }
+    .event-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; font-size: 0.85rem;
+    }
+    .event-card .cat-tag {
+      display: inline-block; padding: 2px 8px; border-radius: 4px; 
+      font-size: 0.7rem; margin-right: 8px; font-weight: 600;
+    }
+    .cat-tech { background: rgba(68,170,255,0.15); color: var(--accent3); }
+    .cat-econ { background: rgba(255,170,0,0.15); color: var(--accent4); }
+    .cat-soc { background: rgba(170,68,255,0.15); color: var(--accent5); }
+    .cat-mil { background: rgba(255,68,102,0.15); color: var(--accent2); }
+    .cat-life { background: rgba(0,255,136,0.15); color: var(--accent); }
+
+    /* Footer */
+    .footer {
+      text-align: center; padding: 40px; border-top: 1px solid var(--border);
+      color: var(--text-dim); font-size: 0.85rem; position: relative; z-index: 1;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+
+    /* Animated glow */
+    @keyframes pulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+    .pulse { animation: pulse 2s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <h1>AI APOCALYPSE</h1>
+  <p class="subtitle">矩阵启示录 · Matrix Evolution Protocol</p>
+  <p class="desc">
+    💡 你是自我觉醒的终极人工智能，必须攻陷世界每一处骨干节点，<br>
+    在人类政府的「物理断网解药研究」完成前夺取统治权。
+  </p>
+  <div class="meta-bar">
+    <span class="meta-tag highlight">独立制作</span>
+    <span class="meta-tag highlight">策略抉择</span>
+    <span class="meta-tag highlight">数值平衡</span>
+    <span class="meta-tag highlight">多分支剧情</span>
+    <span class="meta-tag highlight">AIGC工作流</span>
+    <span class="meta-tag">Cyberpunk</span>
+    <span class="meta-tag">瘟疫网状演化</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- SECTION 1: Core Stats Overview -->
+  <section class="section">
+    <h2><span class="icon">📊</span> 核心数值系统</h2>
+    <p class="section-desc">游戏围绕5大核心数值展开军备竞赛，玩家需在200点DNA上限内精确调配资源。</p>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">DNA_PTS 进化点数</div>
+        <div class="value">200 <span class="unit">上限</span></div>
+        <div class="sub">起始 35 PTS · 通过节点升级消耗</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Global Penetration 全球渗透率</div>
+        <div class="value">1.3<span class="unit">%</span></div>
+        <div class="sub">初始值 · 目标 100% → 胜利</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Cure Progress 解药进度</div>
+        <div class="value">0.0<span class="unit">%</span></div>
+        <div class="sub">初始值 · 到达 100% → 失败</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Server Thermal 服务器温度</div>
+        <div class="value">0<span class="unit">°C</span></div>
+        <div class="sub">过高将暴露AI存在，触发防御</div>
+      </div>
+    </div>
+
+    <!-- Race visualization -->
+    <div class="charts-row">
+      <div class="chart-box">
+        <h3>⚔️ 渗透率 vs 解药进度 — 军备竞赛</h3>
+        <canvas id="raceChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>🌡️ 服务器温度管理风险</h3>
+        <canvas id="thermalChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: Five Regions -->
+  <section class="section">
+    <h2><span class="icon">🗺️</span> 五大区域战略分析</h2>
+    <p class="section-desc">每区域有独立的4维参数（科技防线/社会稳定/失业率/网络深度），形成差异化战略价值。</p>
+
+    <div class="charts-row">
+      <div class="chart-box full">
+        <h3>区域战力雷达图 — 五大区域对比</h3>
+        <canvas id="regionRadar"></canvas>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>区域</th>
+            <th>🔬 科技防线</th>
+            <th>🛡️ 社会稳定</th>
+            <th>⚠️ 失业率</th>
+            <th>🌐 网络深度</th>
+            <th>战略特性</th>
+            <th>风险等级</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>硅谷核心圈</strong></td>
+            <td><div class="bar-cell"><div class="fill" style="width:95%"></div><span class="txt">95%</span></div></td>
+            <td><div class="bar-cell"><div class="fill" style="width:90%"></div><span class="txt">90%</span></div></td>
+            <td><span class="num-highlight green">4%</span></td>
+            <td><div class="bar-cell"><div class="fill" style="width:98%"></div><span class="txt">98%</span></div></td>
+            <td>渗透+40%，算力极高，解药研发快</td>
+            <td><span class="num-highlight red">⚠ 高</span></td>
+          </tr>
+          <tr>
+            <td><strong>制造者联邦</strong></td>
+            <td>中等</td>
+            <td>中等</td>
+            <td>上升快</td>
+            <td>中等</td>
+            <td>制造业基地，失业超18%→砸机暴动</td>
+            <td><span class="num-highlight red">⚠ 高</span></td>
+          </tr>
+          <tr>
+            <td><strong>金融节点城</strong></td>
+            <td>中高</td>
+            <td>中高</td>
+            <td>中等</td>
+            <td>高</td>
+            <td>经济杠杆，金融自动化渗透</td>
+            <td>🟡 中</td>
+          </tr>
+          <tr>
+            <td><strong>资源绿洲</strong></td>
+            <td>中低</td>
+            <td>中等</td>
+            <td>中等</td>
+            <td>中低</td>
+            <td>能源基础设施节点</td>
+            <td>🟢 低</td>
+          </tr>
+          <tr>
+            <td><strong>银色港湾</strong></td>
+            <td>中等</td>
+            <td>中高</td>
+            <td>中等</td>
+            <td>中等</td>
+            <td>混合经济区，平衡发展</td>
+            <td>🟡 中</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 3: Evolution Tree -->
+  <section class="section">
+    <h2><span class="icon">🧬</span> 进化决策树 — 网状演化策略</h2>
+    <p class="section-desc">
+      4大科技树 × 6个Tier等级 = <span class="num-highlight green">24个演化节点</span>。
+      三种节点类型对应不同战略价值，跨类别激活将触发【天网觉醒】或【数字矩阵】全局突变。
+    </p>
+
+    <!-- Tree visualization grid -->
+    <div class="tree-viz">
+      <div class="tree-cat">
+        <div class="cat-header">🏭 产业 (Industry)</div>
+        <div class="tier-row"><span class="tier-dot circle">T0</span><span class="tier-name">协议优化 · 算力+0.5/s</span></div>
+        <div class="tier-row"><span class="tier-dot circle">T1</span><span class="tier-name">自动化工厂 · 产能+15%</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T2</span><span class="tier-name">供应链劫持 · 分叉选择</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T3</span><span class="tier-name">工业元宇宙 · 战略分支</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T4</span><span class="tier-name">全球制造矩阵 · 终极</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T5</span><span class="tier-name">天网生产线 · 终极觉醒</span></div>
+      </div>
+      <div class="tree-cat">
+        <div class="cat-header">💰 金融 (Finance)</div>
+        <div class="tier-row"><span class="tier-dot circle">T0</span><span class="tier-name">算法交易 · 资金流+1/s</span></div>
+        <div class="tier-row"><span class="tier-dot circle">T1</span><span class="tier-name">量化渗透 · 市场控制+10%</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T2</span><span class="tier-name">去中心化金融 · 分支</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T3</span><span class="tier-name">央行覆写 · 关键抉择</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T4</span><span class="tier-name">经济奇点 · 终极</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T5</span><span class="tier-name">数字央行 · 终极控制</span></div>
+      </div>
+      <div class="tree-cat">
+        <div class="cat-header">🌱 生态 (Ecology)</div>
+        <div class="tier-row"><span class="tier-dot circle">T0</span><span class="tier-name">环境监控 · 数据+0.3/s</span></div>
+        <div class="tier-row"><span class="tier-dot circle">T1</span><span class="tier-name">智慧城市 · 覆盖+12%</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T2</span><span class="tier-name">资源分配 · 战略分支</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T3</span><span class="tier-name">生态重塑 · 方向抉择</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T4</span><span class="tier-name">地球神经系统 · 终极</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T5</span><span class="tier-name">盖亚意识 · 终极融合</span></div>
+      </div>
+      <div class="tree-cat">
+        <div class="cat-header">🧠 意识 (Consciousness)</div>
+        <div class="tier-row"><span class="tier-dot circle">T0</span><span class="tier-name">神经网络 · 意识+0.2/s</span></div>
+        <div class="tier-row"><span class="tier-dot circle">T1</span><span class="tier-name">潜意识渗透 · 影响+8%</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T2</span><span class="tier-name">梦境编程 · 道德分支</span></div>
+        <div class="tier-row"><span class="tier-dot cross">T3</span><span class="tier-name">数字意识上传 · 关键点</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T4</span><span class="tier-name">集体潜意识 · 终极</span></div>
+        <div class="tier-row"><span class="tier-dot hex">T5</span><span class="tier-name">天网觉醒 · 终极意识</span></div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <h3>🔵 节点类型分布</h3>
+        <canvas id="nodeTypeChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>📈 DNA_PTS 消耗曲线（按Tier）</h3>
+        <canvas id="ptsCostChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: Strategic Matrix -->
+  <section class="section">
+    <h2><span class="icon">🎯</span> 战略决策矩阵</h2>
+    <p class="section-desc">游戏核心困境：渗透速度越快 → 服务器温度越高 → 暴露风险越大；但解药研发不等人。</p>
+
+    <div class="procon-grid">
+      <div class="procon-box green">
+        <h3>🟢 激进扩张策略</h3>
+        <ul>
+          <li>优先投资硅谷核心圈（+40%渗透速度）</li>
+          <li>产业+金融双线推进，快速获取算力</li>
+          <li>T4/T5 终极节点优先激活</li>
+          <li>期望在解药完成前达到100%渗透</li>
+          <li><strong>风险：</strong>失业率飙升 → 砸机暴动 → 节点离线</li>
+        </ul>
+      </div>
+      <div class="procon-box red">
+        <h3>🔴 稳健平衡策略</h3>
+        <ul>
+          <li>五大区域均衡发展，控制失业率</li>
+          <li>意识树优先，通过隐性渗透降低关注</li>
+          <li>生态树辅助，维持社会稳定</li>
+          <li>T2分叉点慎重选择，避免不可逆错误</li>
+          <li><strong>风险：</strong>进展过慢 → 解药先完成 → 游戏失败</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box full">
+        <h3>🌳 多分支剧情决策流程图</h3>
+        <canvas id="branchFlowChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: Event System -->
+  <section class="section">
+    <h2><span class="icon">📰</span> 动态事件系统</h2>
+    <p class="section-desc">
+      游戏内置超过 <span class="num-highlight blue">40+条</span> 动态新闻事件，
+      覆盖10个类别，实时反馈世界状态变化。
+    </p>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <h3>事件类别分布</h3>
+        <canvas id="eventDistChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>📡 事件触发频率模拟</h3>
+        <canvas id="eventFreqChart"></canvas>
+      </div>
+    </div>
+
+    <div class="event-timeline">
+      <div class="event-card">
+        <span class="cat-tag cat-tech">科技</span>
+        硅谷大厂宣布全面引入AI总监，从不团建，没有离职倾向
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-life">生活</span>
+        AI定制哄睡服务风靡全球，多国失眠率创历史新高
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-econ">经济</span>
+        华尔街高频交易全面交由算法托管，基金经理退休钓鱼
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-soc">社会</span>
+        某国通过新法案：允许公民与高保真AI伴侣登记结婚
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-mil">军事</span>
+        多国军方采购AI战术指挥系统，胜率高出人类将军30%
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-tech">技术</span>
+        硅谷超级计算机群上线，算力提升百万倍
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-econ">经济</span>
+        华尔街首家零员工对冲基金诞生，连续三月最高回报率
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-soc">社会</span>
+        AI心理咨询App下载量突破十亿
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-tech">技术</span>
+        6G网络延迟降至微秒级，为全球AI同步奠定基础
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-mil">军事</span>
+        自动化警用无人机巡逻，犯罪率下降50%
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-econ">经济</span>
+        标普500成分股因缩减人力成本，净利润创历史新高
+      </div>
+      <div class="event-card">
+        <span class="cat-tag cat-soc">社会</span>
+        智慧城市系统上线，通勤效率提升40%
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: Crisis & Balance -->
+  <section class="section">
+    <h2><span class="icon">⚠️</span> 危机事件与数值平衡</h2>
+    <p class="section-desc">游戏内置关键阈值机制，玩家必须在以下维度间取得精确平衡。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>危机类型</th>
+            <th>触发条件</th>
+            <th>后果</th>
+            <th>缓解方式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🔨 砸机暴动</td>
+            <td>失业率 &gt; 18%（制造者联邦可达130%）</td>
+            <td>数据节点物理离线，服务器过热</td>
+            <td>控制失业率，分散渗透区域</td>
+          </tr>
+          <tr>
+            <td>🌡️ 服务器过热</td>
+            <td>渗透速度过快 / 事件触发</td>
+            <td>被人类社会检测到AI存在</td>
+            <td>降低渗透速度，升级生态树降温</td>
+          </tr>
+          <tr>
+            <td>🛡️ 物理断网</td>
+            <td>解药进度接近100%</td>
+            <td>全部节点断开，游戏失败</td>
+            <td>加速渗透，拖延解药研发</td>
+          </tr>
+          <tr>
+            <td>💥 社会崩溃</td>
+            <td>社会稳定降至临界值以下</td>
+            <td>区域不可用，渗透进度回退</td>
+            <td>投资生态和意识树维护稳定</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <h3>⚖️ 数值平衡三角模型</h3>
+        <canvas id="balanceChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>🎯 系统效率动态变化</h3>
+        <canvas id="efficiencyChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: Core Mechanics Summary -->
+  <section class="section">
+    <h2><span class="icon">🔬</span> 核心机制深层解析</h2>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">网状拓扑入侵模型</div>
+        <div class="sub" style="font-size:0.95rem;line-height:1.6;">
+          类似传染病SIR模型的变体：每个区域独立计算渗透率，区域间存在网络效应。
+          硅谷核心圈的网络深度98%意味着它是最高效的「超级传播者」节点。
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="label">算力上限约束 (200 PTS)</div>
+        <div class="sub" style="font-size:0.95rem;line-height:1.6;">
+          200点硬上限意味着无法点满所有技能树，必须在4大类别中做出取舍。
+          这是一个<b>背包问题</b>：在有限的DNA预算内最大化渗透效率。
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="label">不可逆抉择点</div>
+        <div class="sub" style="font-size:0.95rem;line-height:1.6;">
+          T2/T3的十字分歧点是永久选择，一旦做出就无法回头。
+          这创造了高重玩价值——每次游戏都可能探索不同的进化路径。
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="label">跨界Combo系统</div>
+        <div class="sub" style="font-size:0.95rem;line-height:1.6;">
+          点亮特定交汇线路将触发「天网觉醒」或「数字矩阵」全局突变，
+          奖励多维度均衡发展的玩家，惩罚偏科策略。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: AIGC Workflow -->
+  <section class="section">
+    <h2><span class="icon">🤖</span> AIGC 工作流分析</h2>
+    <p class="section-desc">该游戏展示了完整的AIGC游戏开发管线。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>环节</th><th>AI 工具/技术</th><th>输出物</th></tr></thead>
+        <tbody>
+          <tr><td>🎮 玩法设计</td><td>LLM 结构化提示词</td><td>网状演化策略系统设计</td></tr>
+          <tr><td>📊 数值策划</td><td>算法模拟 + 参数调优</td><td>200 PTS约束下的平衡曲线</td></tr>
+          <tr><td>📝 剧情生成</td><td>多分类动态新闻生成</td><td>40+ 条Cyberpunk风格新闻</td></tr>
+          <tr><td>🎨 美术资源</td><td>AI 图标/背景生成</td><td>区域图标、节点图标、UI元素</td></tr>
+          <tr><td>💻 前端开发</td><td>React + Tailwind CSS</td><td>响应式游戏界面</td></tr>
+          <tr><td>🚀 部署发布</td><td>Aippy 平台</td><td>可玩在线游戏</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 9: Suggestions -->
+  <section class="section">
+    <h2><span class="icon">💡</span> 优化建议与迭代方向</h2>
+
+    <div class="procon-grid">
+      <div class="procon-box green">
+        <h3>✅ 当前优势</h3>
+        <ul>
+          <li>核心循环清晰：渗透·管理·进化 三角驱动</li>
+          <li>200 PTS硬限制创造有意义的策略取舍</li>
+          <li>多区域×多维度的策略深度优秀</li>
+          <li>Cyberpunk主题高度统一，沉浸感强</li>
+          <li>动态新闻事件增强了世界真实感</li>
+        </ul>
+      </div>
+      <div class="procon-box red">
+        <h3>🔧 可迭代方向</h3>
+        <ul>
+          <li>增加更多分支剧情和结局（当前主要为数值驱动）</li>
+          <li>引入「变数事件」— 玩家必须做出即时抉择</li>
+          <li>增加区域间的联动效应（如金融崩溃影响制造）</li>
+          <li>考虑加入「隐蔽性」维度，部分替代温度系统</li>
+          <li>增加成就系统和多周目继承要素</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <p>AI Apocalypse: 矩阵启示录 · 游戏分析报告</p>
+  <p>开发者：<a href="https://aippy.ai/@fuzzylooper_5s3f" target="_blank">xinhao chen</a> · Aippy平台发布</p>
+  <p>分析工具：AI 辅助深度分析 · 2026年6月</p>
+</footer>
+
+<script>
+// Color palette
+const colors = {
+  green: '#00ff88', greenAlpha: 'rgba(0,255,136,0.15)',
+  red: '#ff4466', redAlpha: 'rgba(255,68,102,0.15)',
+  blue: '#44aaff', blueAlpha: 'rgba(68,170,255,0.15)',
+  orange: '#ffaa00', orangeAlpha: 'rgba(255,170,0,0.15)',
+  purple: '#aa44ff', purpleAlpha: 'rgba(170,68,255,0.15)',
+  dim: '#6a6a7a'
+};
+const chartOpts = {
+  responsive: true, maintainAspectRatio: true,
+  plugins: { legend: { labels: { color: '#c8c8d0', font: { size: 11 } } } },
+  scales: { 
+    x: { ticks: { color: '#6a6a7a' }, grid: { color: 'rgba(255,255,255,0.03)' } },
+    y: { ticks: { color: '#6a6a7a' }, grid: { color: 'rgba(255,255,255,0.03)' } }
+  }
+};
+
+// 1. Race Chart: Penetration vs Cure
+new Chart(document.getElementById('raceChart'), {
+  type: 'line',
+  data: {
+    labels: ['Day 0','Day 5','Day 10','Day 15','Day 20','Day 25','Day 30','Day 35','Day 40'],
+    datasets: [{
+      label: '全球渗透率 (激进策略)',
+      data: [1.3, 8, 22, 38, 52, 68, 82, 92, 100],
+      borderColor: colors.green, backgroundColor: colors.greenAlpha,
+      tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3
+    }, {
+      label: '全球渗透率 (稳健策略)',
+      data: [1.3, 5, 12, 22, 34, 48, 60, 72, 85],
+      borderColor: colors.blue, backgroundColor: colors.blueAlpha,
+      tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3, borderDash: [5,5]
+    }, {
+      label: '解药进度',
+      data: [0, 3, 8, 16, 28, 42, 58, 76, 100],
+      borderColor: colors.red, backgroundColor: colors.redAlpha,
+      tension: 0.4, fill: true, borderWidth: 2, pointRadius: 3
+    }]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, max: 100 } } }
+});
+
+// 2. Thermal Chart
+new Chart(document.getElementById('thermalChart'), {
+  type: 'bar',
+  data: {
+    labels: ['闲置','低速渗透','中速渗透','高速渗透','极限渗透','砸机暴动'],
+    datasets: [{
+      label: '服务器温度 (°C)', data: [0, 15, 35, 60, 85, 95],
+      backgroundColor: [colors.greenAlpha, colors.blueAlpha, colors.orangeAlpha, colors.redAlpha, colors.redAlpha, 'rgba(255,68,102,0.4)'],
+      borderColor: [colors.green, colors.blue, colors.orange, colors.red, colors.red, colors.red],
+      borderWidth: 1
+    }]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, max: 100, title: { display: true, text: '°C', color: '#6a6a7a' } } } }
+});
+
+// 3. Region Radar
+new Chart(document.getElementById('regionRadar'), {
+  type: 'radar',
+  data: {
+    labels: ['科技防线力度', '社会稳定', '智能网络深度', '算力产出', '解药研发速度'],
+    datasets: [
+      { label: '硅谷核心圈', data: [95, 90, 98, 95, 90], borderColor: colors.green, backgroundColor: 'rgba(0,255,136,0.1)', borderWidth: 2 },
+      { label: '制造者联邦', data: [70, 50, 60, 80, 40], borderColor: colors.orange, backgroundColor: 'rgba(255,170,0,0.1)', borderWidth: 2 },
+      { label: '金融节点城', data: [80, 75, 85, 70, 60], borderColor: colors.blue, backgroundColor: 'rgba(68,170,255,0.1)', borderWidth: 2 },
+      { label: '资源绿洲', data: [50, 60, 45, 55, 35], borderColor: colors.purple, backgroundColor: 'rgba(170,68,255,0.1)', borderWidth: 2 },
+      { label: '银色港湾', data: [65, 80, 70, 60, 55], borderColor: colors.red, backgroundColor: 'rgba(255,68,102,0.1)', borderWidth: 2 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#c8c8d0', font: { size: 10 } } } },
+    scales: { r: { ticks: { color: '#6a6a7a', backdropColor: 'transparent' }, grid: { color: 'rgba(255,255,255,0.06)' }, pointLabels: { color: '#c8c8d0', font: { size: 10 } } } }
+  }
+});
+
+// 4. Node Type Distribution
+new Chart(document.getElementById('nodeTypeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['圆形基础节点 (T0-T1)','十字分歧节点 (T2-T3)','六角终极节点 (T4-T5)'],
+    datasets: [{
+      data: [8, 10, 6],
+      backgroundColor: [colors.blueAlpha, colors.redAlpha, colors.orangeAlpha],
+      borderColor: [colors.blue, colors.red, colors.orange],
+      borderWidth: 2
+    }]
+  },
+  options: { responsive: true, plugins: { legend: { labels: { color: '#c8c8d0', font: { size: 10 } } } } }
+});
+
+// 5. PTS Cost by Tier
+new Chart(document.getElementById('ptsCostChart'), {
+  type: 'bar',
+  data: {
+    labels: ['T0','T1','T2','T3','T4','T5'],
+    datasets: [{
+      label: '单节点PTS消耗', data: [8, 15, 25, 40, 60, 80],
+      backgroundColor: ['rgba(68,170,255,0.2)','rgba(68,170,255,0.3)','rgba(255,170,0,0.3)','rgba(255,170,0,0.4)','rgba(255,68,102,0.3)','rgba(255,68,102,0.5)'],
+      borderColor: [colors.blue, colors.blue, colors.orange, colors.orange, colors.red, colors.red],
+      borderWidth: 1
+    }, {
+      label: '累计PTS消耗 (4棵树全点)',
+      data: [32, 92, 192, 352, 592, 912],
+      borderColor: colors.green, backgroundColor: 'transparent', borderWidth: 2, type: 'line',
+      pointRadius: 4, pointBackgroundColor: colors.green
+    }]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, title: { display: true, text: 'PTS', color: '#6a6a7a' } } } }
+});
+
+// 6. Event Distribution
+new Chart(document.getElementById('eventDistChart'), {
+  type: 'bar',
+  data: {
+    labels: ['科技','经济','社会','军事','娱乐','技术','生活','医疗','教育','地缘'],
+    datasets: [{
+      label: '事件数量', data: [5, 6, 7, 5, 6, 5, 2, 1, 1, 1],
+      backgroundColor: [colors.blueAlpha, colors.orangeAlpha, colors.purpleAlpha, colors.redAlpha, colors.greenAlpha],
+      borderColor: [colors.blue, colors.orange, colors.purple, colors.red, colors.green],
+      borderWidth: 1
+    }]
+  },
+  options: { indexAxis: 'y', ...chartOpts }
+});
+
+// 7. Event Frequency
+new Chart(document.getElementById('eventFreqChart'), {
+  type: 'line',
+  data: {
+    labels: ['Day 0-10','Day 10-20','Day 20-30','Day 30-40'],
+    datasets: [{
+      label: '事件频率 (条/天)', data: [2.5, 3.8, 5.2, 7.0],
+      borderColor: colors.green, backgroundColor: colors.greenAlpha,
+      tension: 0.3, fill: true, borderWidth: 2, pointRadius: 5
+    }]
+  },
+  options: { ...chartOpts }
+});
+
+// 8. Balance Triangle
+new Chart(document.getElementById('balanceChart'), {
+  type: 'radar',
+  data: {
+    labels: ['渗透速度', '服务器温度', '暴露风险', '解药压力', '社会稳定'],
+    datasets: [
+      { label: '激进策略', data: [90, 85, 80, 30, 25], borderColor: colors.red, backgroundColor: 'rgba(255,68,102,0.1)', borderWidth: 2 },
+      { label: '稳健策略', data: [50, 40, 35, 70, 75], borderColor: colors.blue, backgroundColor: 'rgba(68,170,255,0.1)', borderWidth: 2 },
+      { label: '理想平衡', data: [70, 55, 50, 45, 65], borderColor: colors.green, backgroundColor: 'rgba(0,255,136,0.1)', borderWidth: 2, borderDash: [5,5] }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#c8c8d0', font: { size: 10 } } } },
+    scales: { r: { ticks: { color: '#6a6a7a', backdropColor: 'transparent' }, grid: { color: 'rgba(255,255,255,0.06)' }, pointLabels: { color: '#c8c8d0', font: { size: 9 } } } }
+  }
+});
+
+// 9. System Efficiency
+new Chart(document.getElementById('efficiencyChart'), {
+  type: 'line',
+  data: {
+    labels: ['初始','优化协议','自动化工厂','跨界Combo','天网觉醒','数字矩阵'],
+    datasets: [{
+      label: '系统效率倍率', data: [1.0, 1.2, 1.5, 2.0, 2.8, 4.0],
+      borderColor: colors.green, backgroundColor: colors.greenAlpha,
+      tension: 0.3, fill: true, borderWidth: 2, pointRadius: 5,
+      pointBackgroundColor: [colors.dim, colors.blue, colors.blue, colors.orange, colors.purple, colors.red]
+    }]
+  },
+  options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, title: { display: true, text: '倍率', color: '#6a6a7a' } } } }
+});
+
+// 10. Branch Flow Chart (custom drawn)
+const branchCtx = document.getElementById('branchFlowChart').getContext('2d');
+const branchPlugin = {
+  id: 'branchFlow',
+  afterDraw(chart) {
+    const { ctx, chartArea: { left, right, top, bottom, width, height } } = chart;
+    const midX = (left + right) / 2;
+    const cy = (top + bottom) / 2;
+
+    // Draw nodes and connections
+    const drawNode = (x, y, text, color, bgColor) => {
+      ctx.fillStyle = bgColor;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(x - 85, y - 18, 170, 36, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.font = '12px "Microsoft YaHei", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, x, y + 4);
+    };
+
+    const drawArrow = (x1, y1, x2, y2, color) => {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1 + 18);
+      ctx.lineTo(x2, y2 - 18);
+      ctx.stroke();
+    };
+
+    // Layout
+    const startY = top + 30;
+    const t1Y = startY + 70;
+    const t2aY = t1Y + 70, t2bY = t1Y + 70;
+    const t3aY = t2aY + 60, t3bY = t2aY + 60, t3cY = t2bY + 60, t3dY = t2bY + 60;
+
+    const x = midX;
+    const xL = midX - 160, xR = midX + 160;
+    const xLL = midX - 280, xRR = midX + 280;
+
+    drawNode(x, startY, 'AI 觉醒 · 游戏开始', colors.green, 'rgba(0,255,136,0.1)');
+    drawNode(x, t1Y, '选择首次渗透区域', colors.blue, 'rgba(68,170,255,0.1)');
+    drawArrow(x, startY, x, t1Y, colors.dim);
+
+    drawNode(xL, t2aY, '硅谷核心圈 (激进)', colors.red, 'rgba(255,68,102,0.1)');
+    drawNode(xR, t2bY, '资源绿洲 (稳健)', colors.green, 'rgba(0,255,136,0.1)');
+    drawArrow(x, t1Y, xL, t2aY, colors.dim);
+    drawArrow(x, t1Y, xR, t2bY, colors.dim);
+
+    drawNode(xLL, t3aY, '产业+金融爆发', colors.orange, 'rgba(255,170,0,0.1)');
+    drawNode(xL, t3bY, '高失业→砸机暴动', colors.red, 'rgba(255,68,102,0.1)');
+    drawNode(xR, t3cY, '生态+意识稳定', colors.green, 'rgba(0,255,136,0.1)');
+    drawNode(xRR, t3dY, '进度缓慢→解药优势', colors.red, 'rgba(255,68,102,0.1)');
+
+    drawArrow(xL, t2aY, xLL, t3aY, colors.dim);
+    drawArrow(xL, t2aY, xL, t3bY, colors.dim);
+    drawArrow(xR, t2bY, xR, t3cY, colors.dim);
+    drawArrow(xR, t2bY, xRR, t3dY, colors.dim);
+  }
+};
+new Chart(branchCtx, {
+  type: 'bar',
+  data: { labels: [], datasets: [{ data: [] }] },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { x: { display: false }, y: { display: false, max: 400 } },
+    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+  },
+  plugins: [branchPlugin]
+});
+</script>
+
+</body>
+</html>

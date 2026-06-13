@@ -1,0 +1,17 @@
+# Temp files
+*.js
+temp_*
+.playwright-cli/
+current-state.yaml
+game-snapshot.yaml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Node (if any)
+node_modules/
