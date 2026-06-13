@@ -228,6 +228,95 @@
     .lightbox .nav-btn:hover { opacity: 1; }
     .lightbox .nav-btn.prev { left: 10px; }
     .lightbox .nav-btn.next { right: 10px; }
+
+    /* Philosophy pillars */
+    .philosophy-section {
+      margin-bottom: 60px;
+    }
+    .philosophy-section .section-intro {
+      color: var(--text-dim);
+      margin-bottom: 36px;
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 900px;
+    }
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .pillars-grid { grid-template-columns: 1fr; }
+    }
+    .pillar-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+    .pillar-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      transition: height 0.3s;
+    }
+    .pillar-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent2), var(--accent4)); }
+    .pillar-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent3), var(--accent)); }
+    .pillar-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent5), var(--accent3)); }
+    .pillar-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+      transform: translateY(-4px);
+    }
+    .pillar-card:hover::before { height: 4px; }
+    .pillar-card .pillar-icon {
+      font-size: 2.2rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .pillar-card .pillar-title {
+      font-size: 1.15rem;
+      color: var(--text-bright);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .pillar-card .pillar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+    .pillar-card .pillar-block {
+      margin-bottom: 14px;
+    }
+    .pillar-card .pillar-block .label {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .pillar-card .pillar-block p {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      line-height: 1.65;
+    }
+    .pillar-quote {
+      font-style: italic;
+      color: var(--text-bright);
+      font-size: 0.9rem;
+      padding: 10px 14px;
+      margin-top: 12px;
+      border-left: 2px solid var(--accent);
+      background: rgba(0,255,136,0.03);
+      border-radius: 0 6px 6px 0;
+    }
   </style>
 </head>
 <body>
@@ -283,6 +372,63 @@
       <span class="nav-btn prev" onclick="event.stopPropagation();navigateLightbox(-1)">&#10094;</span>
       <img id="lightbox-img" src="" alt="">
       <span class="nav-btn next" onclick="event.stopPropagation();navigateLightbox(1)">&#10095;</span>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY: 开发初衷 -->
+<section class="container philosophy-section" style="padding-top:0;">
+  <div class="section">
+    <h2><span class="icon">💭</span> 开发初衷 — 我为什么做这款游戏</h2>
+    <p class="section-intro">
+      对我而言，<strong>游戏从来不只是一种娱乐</strong>。它是这个时代最有力的表达媒介，是数学与艺术的交汇点，是能让人真正「活在一个故事里」的唯一形式。《AI末日》的诞生，源自我对三个核心命题的思考。
+    </p>
+
+    <div class="pillars-grid">
+      <!-- 支柱一：游戏作为"表达的载体" -->
+      <div class="pillar-card">
+        <span class="pillar-icon">🎭</span>
+        <div class="pillar-title">游戏作为「表达的载体」</div>
+        <div class="pillar-subtitle">直面时代的焦虑</div>
+        <div class="pillar-block">
+          <div class="label">初衷的投射</div>
+          <p>我的初衷不是做一款简单的「杀时间小游戏」，而是用<strong>《瘟疫公司》式冷酷的上帝视角</strong>，做一面讽刺又深刻的镜子——精准映照我们这个时代最真实的群体焦虑：对技术的狂热、对失业的恐惧、对精神虚无的迷茫。</p>
+        </div>
+        <div class="pillar-block">
+          <div class="label">游戏的力量</div>
+          <p>让玩家在敲击屏幕「升级算法」的快感中，猛然发现自己正在亲手毁灭人类自己。这种<strong>「共谋之后的震撼」</strong>，是只有游戏这种交互媒介才能做到的艺术表达。</p>
+        </div>
+      </div>
+
+      <!-- 支柱二：游戏作为"机制的艺术" -->
+      <div class="pillar-card">
+        <span class="pillar-icon">🧩</span>
+        <div class="pillar-title">游戏作为「机制的艺术」</div>
+        <div class="pillar-subtitle">追求纯粹的脑力博弈</div>
+        <div class="pillar-block">
+          <div class="label">初衷的投射</div>
+          <p>策略游戏的核心魅力，在于<strong>「用最简单的规则，构建最复杂的网状涌现」</strong>。我从一开始就想设计一个精妙的数学模型——没有一成不变的通关公式，每个人必须找到自己的策略路径。</p>
+        </div>
+        <div class="pillar-block">
+          <div class="label">游戏的力量</div>
+          <p>玩家需要根据人类政府的反应（解药进度），在<strong>「温水煮青蛙的暗中渗透」</strong>和<strong>「钢铁洪流的暴力接管」</strong>之间做动态博弈。那种抓耳挠腮、通关后长舒一口气的多巴胺分泌，就是独立游戏最纯粹的快乐。</p>
+        </div>
+      </div>
+
+      <!-- 支柱三：游戏作为"沉浸的容器" -->
+      <div class="pillar-card">
+        <span class="pillar-icon">🔮</span>
+        <div class="pillar-title">游戏作为「沉浸的容器」</div>
+        <div class="pillar-subtitle">用视听编织一个世界</div>
+        <div class="pillar-block">
+          <div class="label">初衷的投射</div>
+          <p>打造一个<strong>「活生生的世界」</strong>——我为它储备了120多条讽刺的流动字幕新闻，设计了随着AI渗透率提高而不断「代码变异、扭曲失真」的动态BGM。</p>
+        </div>
+        <div class="pillar-block">
+          <div class="label">游戏的力量</div>
+          <p>当玩家戴上耳机，听到干净的科技合成器音乐逐渐变成冰冷的机械降神唱诗班，看到屏幕顶端滚过一行行因失业而引发的赛博迷茫新闻——他不再是一个旁观者，<strong>他成了那个「硅基意识本身」</strong>。这种让人全身心投入的「心流状态」，就是我作为造物主的初衷。</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
