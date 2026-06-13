@@ -195,11 +195,21 @@ AI-Apocalypse-Strategy/
 
 ## 📸 游戏截图
 
-| 启动界面 | 主控制面板 |
+### 🖥️ Desktop View (1920×1080)
+
+| 启动界面 | 区域监控面板 |
 |:---:|:---:|
-| ![启动界面](game-landing.png) | ![主面板](game-dashboard.png) |
+| ![启动界面](desktop-01-landing.png) | ![区域监控](desktop-02-dashboard.png) |
 | **进化决策树** | **主动战术防御** |
-| ![进化树](game-evolution-tree.png) | ![战术防御](game-tactical-defense.png) |
+| ![进化树](desktop-03-evolution-tree.png) | ![战术防御](desktop-04-tactical-defense.png) |
+
+### 📱 Mobile View (390×844)
+
+| 启动界面 | 区域监控面板 |
+|:---:|:---:|
+| ![启动界面](mobile-01-landing.png) | ![区域监控](mobile-02-dashboard.png) |
+| **进化决策树** | **主动战术防御** |
+| ![进化树](mobile-03-evolution-tree.png) | ![战术防御](mobile-04-tactical-defense.png) |
 
 ---
 

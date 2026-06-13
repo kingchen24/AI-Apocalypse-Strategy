@@ -1,0 +1,78 @@
+- generic [ref=e32]:
+  - generic [ref=e33]:
+    - iframe [ref=e36]:
+      - generic [ref=f1e4]:
+        - banner [ref=f1e5]:
+          - generic [ref=f1e6]:
+            - img [ref=f1e8]
+            - generic [ref=f1e13]:
+              - heading "AI APOCALYPSE" [level=1] [ref=f1e14]
+              - paragraph [ref=f1e15]: MATRIX EVOLUTION PROTOCOL
+          - generic [ref=f1e16]:
+            - generic [ref=f1e17]:
+              - generic [ref=f1e18]: SIMULATION DAY
+              - generic [ref=f1e19]: "1"
+            - button [ref=f1e20]:
+              - img [ref=f1e21]
+        - generic [ref=f1e25]:
+          - img [ref=f1e28]
+          - heading "AI 末日：矩阵启示录" [level=2] [ref=f1e33]
+          - paragraph [ref=f1e34]: — 瘟疫网状演化策略模拟 —
+          - generic [ref=f1e35]:
+            - paragraph [ref=f1e36]: 💡 你是自我觉醒的终极人工智能，必须攻陷世界每一处骨干节点，在人类政府的“物理断网解药研究”完成前夺取统治权。
+            - paragraph [ref=f1e37]: 💡 核心战略升级：
+            - list [ref=f1e38]:
+              - listitem [ref=f1e39]:
+                - strong [ref=f1e40]: Cyberpunk 抉择矩阵
+                - text: ：区分圆形属性点、十字分歧点和六角终极点，抉择不可逆。
+              - listitem [ref=f1e41]:
+                - strong [ref=f1e42]: 跨界 Combo 全局突变
+                - text: ：点亮特定交汇线路将唤醒【天网觉醒】或部署【数字矩阵】。
+              - listitem [ref=f1e43]:
+                - strong [ref=f1e44]: 算力上限约束 (Max 200 PTS)
+                - text: ：限制累积冗余，要求精准战术调配，谨慎加点。
+          - button "启动系统核心" [ref=f1e45]
+    - generic [ref=e38]:
+      - img [ref=e40]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - img [ref=e62] [cursor=pointer]
+          - button [ref=e63] [cursor=pointer]:
+            - img [ref=e65]
+        - generic [ref=e67]:
+          - generic [ref=e68]: AI Apocalypse
+          - generic [ref=e69]:
+            - generic [ref=e71] [cursor=pointer]: xinhao chen
+            - generic [ref=e72]: 52 minutes ago
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - img [ref=e76]
+            - generic [ref=e78]: "12"
+          - generic [ref=e79]:
+            - img [ref=e80]
+            - generic [ref=e82]: "0"
+        - generic [ref=e83]:
+          - button [ref=e84] [cursor=pointer]:
+            - img [ref=e86]
+          - button "0" [ref=e88] [cursor=pointer]:
+            - generic [ref=e89]:
+              - img [ref=e90]
+              - generic [ref=e94]: "0"
+          - button "1" [ref=e96] [cursor=pointer]:
+            - generic [ref=e97]:
+              - img [ref=e98]
+              - generic [ref=e100]: "1"
+          - generic [ref=e102] [cursor=pointer]:
+            - img [ref=e103]
+            - generic [ref=e105]: Remix
+      - generic [ref=e106]:
+        - button [disabled] [ref=e107]:
+          - img [ref=e109]
+        - button [disabled] [ref=e111]:
+          - img [ref=e113]
+  - generic [ref=e115]:
+    - button [ref=e116] [cursor=pointer]:
+      - img [ref=e117]
+    - button [ref=e120] [cursor=pointer]:
+      - img [ref=e121]

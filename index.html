@@ -200,11 +200,22 @@
     @keyframes pulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
     .pulse { animation: pulse 2s ease-in-out infinite; }
 
-    /* Screenshot gallery */
+    /* Screenshot gallery - desktop/mobile tabs */
+    .screen-tabs {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .screen-tab {
+      padding: 8px 24px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--panel); color: var(--text-dim); cursor: pointer;
+      font-size: 0.85rem; transition: all 0.3s;
+    }
+    .screen-tab.active { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); }
+    .screen-tab:hover:not(.active) { border-color: var(--text-dim); color: var(--text-bright); }
     .screenshot-gallery {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+      display: none; grid-template-columns: repeat(2, 1fr); gap: 16px;
       margin-bottom: 30px;
     }
+    .screenshot-gallery.active { display: grid; }
     @media (max-width: 768px) { .screenshot-gallery { grid-template-columns: 1fr; } }
     .screenshot-card {
       background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
@@ -347,25 +358,54 @@
 <section class="container" style="padding-top:0;">
   <div class="section">
     <h2><span class="icon">📸</span> 游戏实战截图</h2>
-    <p class="section-desc">以下是我使用 Aippy 平台开发的游戏实际运行截图，展示了核心界面与交互系统。</p>
-    <div class="screenshot-gallery" id="gallery">
-      <div class="screenshot-card" onclick="openLightbox(0)">
-        <img src="game-landing.png" alt="游戏启动界面" loading="lazy">
-        <div class="caption"><strong>🟢 启动界面</strong> — 赛博朋克风格的矩阵演化协议入口</div>
+    <p class="section-desc">完整展示 Desktop (1920×1080) 与 Mobile (390×844) 两个视口下的全部游戏界面，不漏任何玩法信息。</p>
+
+    <!-- Viewport Tabs -->
+    <div class="screen-tabs">
+      <div class="screen-tab active" onclick="switchScreenTab('desktop')">🖥️ Desktop View</div>
+      <div class="screen-tab" onclick="switchScreenTab('mobile')">📱 Mobile View</div>
+    </div>
+
+    <!-- Desktop Gallery -->
+    <div class="screenshot-gallery active" id="desktop-gallery">
+      <div class="screenshot-card" onclick="openLightbox('desktop-01-landing.png')">
+        <img src="desktop-01-landing.png" alt="桌面版-启动界面" loading="lazy">
+        <div class="caption"><strong>🟢 启动界面</strong> — 矩阵演化协议入口，Cyberpunk叙事引入</div>
       </div>
-      <div class="screenshot-card" onclick="openLightbox(1)">
-        <img src="game-dashboard.png" alt="主控制面板" loading="lazy">
-        <div class="caption"><strong>📊 主控制面板</strong> — DNA_PTS / 温度 / 渗透率 / 解药进度实时监控</div>
+      <div class="screenshot-card" onclick="openLightbox('desktop-02-dashboard.png')">
+        <img src="desktop-02-dashboard.png" alt="桌面版-区域监控面板" loading="lazy">
+        <div class="caption"><strong>📊 区域监控面板</strong> — 五大区域 / 动态新闻 / 温度·渗透·解药实时数据</div>
       </div>
-      <div class="screenshot-card" onclick="openLightbox(2)">
-        <img src="game-evolution-tree.png" alt="进化决策树" loading="lazy">
+      <div class="screenshot-card" onclick="openLightbox('desktop-03-evolution-tree.png')">
+        <img src="desktop-03-evolution-tree.png" alt="桌面版-进化决策树" loading="lazy">
         <div class="caption"><strong>🧬 进化决策树</strong> — 4大科技树 × 6级Tier，圆形/十字/六角三类节点</div>
       </div>
-      <div class="screenshot-card" onclick="openLightbox(3)">
-        <img src="game-tactical-defense.png" alt="主动战术防御" loading="lazy">
-        <div class="caption"><strong>🛡️ 主动战术防御</strong> — 散热液灌注 / 网络挟持 / 虚假多巴胺维稳</div>
+      <div class="screenshot-card" onclick="openLightbox('desktop-04-tactical-defense.png')">
+        <img src="desktop-04-tactical-defense.png" alt="桌面版-主动战术防御" loading="lazy">
+        <div class="caption"><strong>🛡️ 主动战术防御</strong> — 散热液灌注 / 网络挟持 / 虚假多巴胺维稳 / 算力调控</div>
       </div>
     </div>
+
+    <!-- Mobile Gallery -->
+    <div class="screenshot-gallery" id="mobile-gallery">
+      <div class="screenshot-card" onclick="openLightbox('mobile-01-landing.png')">
+        <img src="mobile-01-landing.png" alt="移动版-启动界面" loading="lazy">
+        <div class="caption"><strong>🟢 启动界面</strong> — 移动端自适应布局，触控友好</div>
+      </div>
+      <div class="screenshot-card" onclick="openLightbox('mobile-02-dashboard.png')">
+        <img src="mobile-02-dashboard.png" alt="移动版-区域监控面板" loading="lazy">
+        <div class="caption"><strong>📊 区域监控面板</strong> — 移动端优化，新闻滚动与数据一览</div>
+      </div>
+      <div class="screenshot-card" onclick="openLightbox('mobile-03-evolution-tree.png')">
+        <img src="mobile-03-evolution-tree.png" alt="移动版-进化决策树" loading="lazy">
+        <div class="caption"><strong>🧬 进化决策树</strong> — 移动端技能树适配，触控加点</div>
+      </div>
+      <div class="screenshot-card" onclick="openLightbox('mobile-04-tactical-defense.png')">
+        <img src="mobile-04-tactical-defense.png" alt="移动版-主动战术防御" loading="lazy">
+        <div class="caption"><strong>🛡️ 主动战术防御</strong> — 移动端防御面板，快捷操作</div>
+      </div>
+    </div>
+
     <!-- Lightbox -->
     <div class="lightbox" id="lightbox" onclick="closeLightbox()">
       <span class="close-btn">&times;</span>
@@ -1118,26 +1158,26 @@ new Chart(branchCtx, {
 });
 });
 
-// 11. Lightbox Gallery
-const galleryImages = [
-  'game-landing.png',
-  'game-dashboard.png',
-  'game-evolution-tree.png',
-  'game-tactical-defense.png'
+// 11. Lightbox Gallery + Tab Switching
+const allGalleryImages = [
+  'desktop-01-landing.png','desktop-02-dashboard.png','desktop-03-evolution-tree.png','desktop-04-tactical-defense.png',
+  'mobile-01-landing.png','mobile-02-dashboard.png','mobile-03-evolution-tree.png','mobile-04-tactical-defense.png'
 ];
-let currentImgIndex = 0;
+let currentImgSrc = '';
 
-function openLightbox(idx) {
-  currentImgIndex = idx;
-  document.getElementById('lightbox-img').src = galleryImages[idx];
+function openLightbox(src) {
+  currentImgSrc = src;
+  document.getElementById('lightbox-img').src = src;
   document.getElementById('lightbox').classList.add('active');
 }
 function closeLightbox() {
   document.getElementById('lightbox').classList.remove('active');
 }
 function navigateLightbox(dir) {
-  currentImgIndex = (currentImgIndex + dir + galleryImages.length) % galleryImages.length;
-  document.getElementById('lightbox-img').src = galleryImages[currentImgIndex];
+  const idx = allGalleryImages.indexOf(currentImgSrc);
+  const newIdx = (idx + dir + allGalleryImages.length) % allGalleryImages.length;
+  currentImgSrc = allGalleryImages[newIdx];
+  document.getElementById('lightbox-img').src = currentImgSrc;
 }
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('active')) return;
@@ -1145,6 +1185,19 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') navigateLightbox(-1);
   if (e.key === 'ArrowRight') navigateLightbox(1);
 });
+
+// Tab switching
+function switchScreenTab(view) {
+  document.querySelectorAll('.screen-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.screenshot-gallery').forEach(g => g.classList.remove('active'));
+  if (view === 'desktop') {
+    document.querySelectorAll('.screen-tab')[0].classList.add('active');
+    document.getElementById('desktop-gallery').classList.add('active');
+  } else {
+    document.querySelectorAll('.screen-tab')[1].classList.add('active');
+    document.getElementById('mobile-gallery').classList.add('active');
+  }
+}
 </script>
 
 </body>
